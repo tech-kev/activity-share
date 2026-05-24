@@ -48,7 +48,9 @@ Portainer ≥ 2.x kann Activity Share direkt aus diesem Repository deployen
 1. **Repository URL**: `https://github.com/tech-kev/activity-share`
 2. **Reference**: `refs/heads/main`
 3. **Compose path**: `docker-compose.yml`
-4. **Deploy the stack**.
+4. (optional) **Environment variables** → `EXTERNAL_PORT = 8080` (oder beliebig),
+   um den nach außen exponierten Host-Port zu ändern (Default: `3000`).
+5. **Deploy the stack**.
 
 Portainer klont das Repo, baut das Image (Multi-Stage, dauert beim ersten Mal
 ~2 Minuten) und startet den Container auf Port 3000. Persistente Daten landen
