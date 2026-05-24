@@ -1,0 +1,19 @@
+services:
+  activity-share:
+    build: .
+    container_name: activity-share
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: production
+      DATA_DIR: /data
+      UPLOADS_DIR: /data/uploads
+      DEFAULT_PHOTOS_DIR: /default-photos
+    volumes:
+      - activity-share-data:/data
+      # Lege deine Standardbilder einfach in ./default-photos/ ab.
+      - ./default-photos:/default-photos:ro
+
+volumes:
+  activity-share-data:

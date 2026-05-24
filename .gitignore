@@ -1,8 +1,27 @@
 node_modules/
+**/node_modules/
+dist/
+**/dist/
+
 .netlify
 .cache
 .localserver
 .npm
 .env
+.env.local
 .DS_Store
 .htaccess
+*.log
+
+# App-Datenverzeichnisse (lokal, Volume in Docker)
+backend/data/*
+!backend/data/.gitkeep
+backend/uploads/*
+!backend/uploads/.gitkeep
+
+# Frontend
+frontend/.vite/
+
+# IDE
+.vscode/
+.idea/

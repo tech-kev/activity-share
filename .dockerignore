@@ -1,0 +1,14 @@
+node_modules
+**/node_modules
+**/dist
+.git
+.github
+.claude
+reference
+problems.md
+claude.md
+README.md
+*.log
+.DS_Store
+backend/data
+backend/uploads
