@@ -46,7 +46,7 @@ Portainer ≥ 2.x kann Activity Share direkt aus diesem Repository deployen
 ("Stacks → Add stack → Repository"):
 
 1. **Repository URL**: `https://github.com/tech-kev/activity-share`
-2. **Reference**: `refs/heads/master` (oder dein Branch)
+2. **Reference**: `refs/heads/main`
 3. **Compose path**: `docker-compose.yml`
 4. **Deploy the stack**.
 
