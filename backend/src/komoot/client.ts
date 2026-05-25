@@ -60,33 +60,59 @@ function commonHeaders(authValue: string): Record<string, string> {
  */
 function resolveImageUrl(src: string | undefined, templated: boolean): string | undefined {
   if (!src) return undefined;
-  if (!templated) return src;
-  return src
-    .replace(/\{width\}/g, '480')
-    .replace(/\{height\}/g, '320')
-    .replace(/\{crop\}/g, '');
+  let resolved = src;
+  if (templated) {
+    resolved = src
+      .replace(/\{width\}/g, '480')
+      .replace(/\{height\}/g, '320')
+      .replace(/\{crop\}/g, '')
+      .replace(/\{quality\}/g, '70')
+      .replace(/\{scale\}/g, '1');
+  }
+  // Wenn nach dem Resolve noch unaufgelöste Platzhalter `{…}` drin sind, ist
+  // die URL für uns nicht brauchbar.
+  if (/\{[^}]+\}/.test(resolved)) return undefined;
+  return resolved;
 }
 
 export async function komootLogin(email: string, password: string): Promise<KomootSession> {
-  const url = `${BASE_URL}/v007/account/email/${encodeURIComponent(email)}/`;
-  const res = await fetch(url, { headers: commonHeaders(basicAuth(email, password)) });
-  if (res.status === 401) throw new Error('E-Mail oder Passwort falsch');
-  if (!res.ok) throw new Error(`Komoot-Login fehlgeschlagen (HTTP ${res.status})`);
-  const data = (await res.json()) as {
-    email?: string;
-    username?: string;
-    password?: string;
-    user?: { displayname?: string };
-  };
-  if (!data.username || !data.password) {
-    throw new Error('Unerwartete Login-Antwort von Komoot');
+  // Komoot betreibt parallel mehrere API-Versionen. Bei manchen Accounts liefert
+  // /v007/account/email/... HTTP 404 trotz korrektem Passwort, während /v006/
+  // funktioniert (und andersrum). Wir probieren beide; 401 (falsche Credentials)
+  // gewinnt zuerst und bricht ab.
+  const versions = ['v006', 'v007'] as const;
+  const errors: string[] = [];
+  for (const version of versions) {
+    const url = `${BASE_URL}/${version}/account/email/${encodeURIComponent(email)}/`;
+    const res = await fetch(url, { headers: commonHeaders(basicAuth(email, password)) });
+    if (res.status === 401) throw new Error('E-Mail oder Passwort falsch');
+    if (res.ok) {
+      const data = (await res.json()) as {
+        email?: string;
+        username?: string;
+        password?: string;
+        user?: { displayname?: string };
+      };
+      if (!data.username || !data.password) {
+        throw new Error('Unerwartete Login-Antwort von Komoot');
+      }
+      return {
+        email: data.email ?? email,
+        userId: String(data.username),
+        token: data.password,
+        displayName: data.user?.displayname,
+      };
+    }
+    // Body für Diagnose mitnehmen
+    const bodySnippet = await res
+      .text()
+      .then((t) => t.slice(0, 200))
+      .catch(() => '');
+    errors.push(`${version}: HTTP ${res.status}${bodySnippet ? ` — ${bodySnippet}` : ''}`);
   }
-  return {
-    email: data.email ?? email,
-    userId: String(data.username),
-    token: data.password,
-    displayName: data.user?.displayname,
-  };
+  throw new Error(
+    `Komoot-Login fehlgeschlagen (keine Version akzeptiert): ${errors.join(' | ')}`,
+  );
 }
 
 interface ApiTour {

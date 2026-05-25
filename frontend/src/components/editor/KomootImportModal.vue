@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
-import { useKomootStore, komootImageProxyUrl } from '@/stores/komoot';
+import { useKomootStore } from '@/stores/komoot';
 import { useGpxStore } from '@/stores/gpx';
 import { useEditorStore } from '@/stores/editor';
 
@@ -185,25 +185,18 @@ async function next() {
             <li
               v-for="t in komoot.tours"
               :key="t.id"
-              class="flex items-center gap-3 rounded-md border border-ink-800 bg-ink-850 p-2 hover:border-accent"
+              class="flex items-center gap-3 rounded-md border border-ink-800 bg-ink-850 p-3 hover:border-accent"
             >
-              <img
-                v-if="t.mapImage"
-                :src="komootImageProxyUrl(t.mapImage)!"
-                alt=""
-                class="h-16 w-24 shrink-0 rounded-sm object-cover bg-ink-900"
-                loading="lazy"
-              />
-              <div v-else class="h-16 w-24 shrink-0 rounded-sm bg-ink-900" />
               <div class="min-w-0 flex-1">
                 <p class="truncate text-sm font-medium" :title="t.name">{{ t.name }}</p>
                 <p class="truncate text-xs text-ink-400">
                   {{ formatDate(t.date) }} · {{ formatKm(t.distance) }} · {{ formatDuration(t.duration) }}
+                  <span v-if="t.elevationUp"> · ↑ {{ Math.round(t.elevationUp) }} m</span>
                 </p>
                 <p class="text-xs text-ink-500">{{ t.sport }}</p>
               </div>
               <button
-                class="btn-primary !px-2 !py-1 text-xs"
+                class="btn-primary !px-3 !py-1 text-xs"
                 :disabled="komoot.importing === t.id"
                 @click="onImport(t.id)"
               >
