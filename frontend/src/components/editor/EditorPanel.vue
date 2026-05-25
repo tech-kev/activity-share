@@ -5,12 +5,16 @@ import { useEditorStore } from '@/stores/editor';
 import { useGpxStore } from '@/stores/gpx';
 import { useSettingsStore } from '@/stores/settings';
 import { FORMAT_SIZES, type ImageFormat } from '@/types';
+import { ref } from 'vue';
 import GpxDropzone from './GpxDropzone.vue';
 import PhotoDropzone from './PhotoDropzone.vue';
 import StatsEditor from './StatsEditor.vue';
 import ElementsList from './ElementsList.vue';
 import ImageFilterPanel from './ImageFilterPanel.vue';
 import DefaultPhotosPicker from './DefaultPhotosPicker.vue';
+import KomootImportModal from './KomootImportModal.vue';
+
+const komootOpen = ref(false);
 
 const editor = useEditorStore();
 const gpx = useGpxStore();
@@ -25,6 +29,13 @@ const activities = computed(() => settings.values.activities ?? []);
   <div class="flex h-full flex-col overflow-y-auto p-4 space-y-5 text-sm">
     <section class="space-y-2">
       <GpxDropzone />
+      <button
+        type="button"
+        class="btn-secondary w-full !justify-center"
+        @click="komootOpen = true"
+      >
+        Aus Komoot importieren
+      </button>
     </section>
     <section class="space-y-2">
       <PhotoDropzone />
@@ -93,5 +104,7 @@ const activities = computed(() => settings.values.activities ?? []);
     <ElementsList />
     <ImageFilterPanel v-if="editor.photo.originalUrl" />
     <StatsEditor v-if="gpx.stats" />
+
+    <KomootImportModal v-if="komootOpen" @close="komootOpen = false" />
   </div>
 </template>

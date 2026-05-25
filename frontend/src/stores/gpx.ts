@@ -38,6 +38,21 @@ export const useGpxStore = defineStore('gpx', {
         this.parsing = false;
       }
     },
+    loadText(text: string, fileName: string) {
+      this.error = null;
+      this.parsing = true;
+      try {
+        this.stats = parseGpx(text);
+        this.fileName = fileName;
+        this.overrides = {};
+      } catch (e) {
+        this.stats = null;
+        this.fileName = null;
+        this.error = e instanceof Error ? e.message : 'GPX-Daten konnten nicht gelesen werden';
+      } finally {
+        this.parsing = false;
+      }
+    },
     setOverride(key: string, value: string | null) {
       if (value === null || value === '') {
         delete this.overrides[key];

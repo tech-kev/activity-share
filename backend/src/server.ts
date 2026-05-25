@@ -9,6 +9,7 @@ import { authRouter } from './routes/auth.js';
 import { settingsRouter } from './routes/settings.js';
 import { uploadRouter } from './routes/upload.js';
 import { defaultPhotosRouter } from './routes/defaultPhotos.js';
+import { komootRouter } from './routes/komoot.js';
 
 const app = express();
 app.disable('x-powered-by');
@@ -38,6 +39,7 @@ app.use('/api/auth', authRouter);
 app.use('/api/settings', settingsRouter);
 app.use('/api/upload', uploadRouter);
 app.use('/api/default-photos', defaultPhotosRouter);
+app.use('/api/komoot', komootRouter);
 
 // Statisch: Uploads + Default-Photos
 app.use('/uploads', express.static(config.uploadsDir, { maxAge: '7d' }));
